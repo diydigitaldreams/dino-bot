@@ -20,10 +20,17 @@ export async function handleMessage(dino, text, send) {
   if (isUrl) {
     await send('_🦕 nom nom... processing that..._')
     for (const url of urls) {
-      const result = await processUrl(url)
-      if (result) {
-        addMemory(dino, `From ${result.url} (${result.title}): ${result.summary}`)
-        urlFed = true
+      try {
+        const result = await processUrl(url)
+        if (result) {
+          addMemory(dino, `From ${result.url} (${result.title}): ${result.summary}`)
+          urlFed = true
+        } else {
+          await send(`_couldn't read that link — might be paywalled or blocked_`)
+        }
+      } catch (err) {
+        console.error('URL processing error:', err.message)
+        await send(`_had trouble digesting that link, try another one_`)
       }
     }
   }

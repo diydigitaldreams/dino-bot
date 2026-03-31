@@ -89,8 +89,12 @@ export async function scrapeUrl(url) {
 }
 
 export async function processUrl(url) {
-  const scraped = await scrapeUrl(url)
-  if (!scraped) return null
-  const summary = await summarizeUrl(url, scraped.body)
-  return { title: scraped.title, summary, url }
+  try {
+    const scraped = await scrapeUrl(url)
+    if (!scraped) return null
+    const summary = await summarizeUrl(url, scraped.body)
+    return { title: scraped.title, summary, url }
+  } catch {
+    return null
+  }
 }
