@@ -1,0 +1,19 @@
+{
+  "name": "dino-bot",
+  "version": "1.0.0",
+  "description": "Tamagotchi-style evolving WhatsApp AI assistant",
+  "type": "module",
+  "main": "src/bot.js",
+  "scripts": {
+    "start": "node src/bot.js",
+    "dev": "node --watch src/bot.js"
+  },
+  "dependencies": {
+    "@whiskeysockets/baileys": "^6.7.9",
+    "dotenv": "^16.4.5",
+    "node-fetch": "^3.3.2",
+    "pino": "^9.2.0",
+    "pino-pretty": "^11.2.1",
+    "cheerio": "^1.0.0"
+  }
+}
