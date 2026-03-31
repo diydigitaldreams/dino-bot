@@ -1,4 +1,4 @@
-import { readFileSync, writeFileSync, existsSync, mkdirSync, readdirSync } from 'fs'
+import { readFileSync, writeFileSync, existsSync, mkdirSync, readdirSync, renameSync } from 'fs'
 import { join, dirname } from 'path'
 import { fileURLToPath } from 'url'
 
@@ -40,7 +40,10 @@ export function createDino(phone) {
 
 export function saveDino(dino) {
   dino.last_seen = Math.floor(Date.now() / 1000)
-  writeFileSync(dinoPath(dino.phone), JSON.stringify(dino, null, 2))
+  const target = dinoPath(dino.phone)
+  const tmp    = target + '.tmp'
+  writeFileSync(tmp, JSON.stringify(dino, null, 2))
+  renameSync(tmp, target)
 }
 
 export function getAllDinos() {
