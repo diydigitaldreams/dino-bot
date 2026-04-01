@@ -87,12 +87,13 @@ async function handleCommand(dino, text, send) {
       await send(`${STAGE_EMOJI[dino.stage]} *${dino.name}* — I have a name now! 🎉`)
       break
 
-    case '/feed':
+    case '/feed': {
       dino.hunger    = Math.min(100, dino.hunger + 30)
       dino.happiness = Math.min(100, dino.happiness + 10)
       const snacks = ['🍖', '🌿', '🦴', '🍇', '🥩']
       await send(`${snacks[Math.floor(Math.random() * snacks.length)]} *nom nom* +30 hunger`)
       break
+    }
 
     case '/help':
       await send(

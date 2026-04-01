@@ -107,8 +107,12 @@ async function startBot() {
         msg.message.conversation ||
         msg.message.extendedTextMessage?.text ||
         msg.message.imageMessage?.caption ||
+        msg.message.extendedTextMessage?.canonicalUrl ||
         ''
-      const text = raw.trim().slice(0, 2000)
+
+      // Also grab any URL from WhatsApp link previews
+      const previewUrl = msg.message.extendedTextMessage?.canonicalUrl || ''
+      const text = (previewUrl ? `${raw.trim()} ${previewUrl}` : raw.trim()).slice(0, 2000)
       if (!text) continue
 
       enqueue(async () => {
