@@ -32,7 +32,10 @@ function isSafeUrl(urlStr) {
 }
 
 export function extractUrls(text) {
-  return (text.match(URL_REGEX) ?? []).filter(isSafeUrl)
+  const raw = text.match(URL_REGEX) ?? []
+  return raw
+    .map(u => u.replace(/[.,!?)>»\]'"]+$/, '')) // strip trailing punctuation
+    .filter(isSafeUrl)
 }
 
 // Transient states to exclude from personality storage
@@ -69,9 +72,12 @@ export function extractPersonalityTraits(text) {
 }
 
 export async function scrapeUrl(url) {
-  if (!isSafeUrl(url)) return null
+  if (!isSafeUrl(url)) {
+    console.log(`[url] blocked: ${url}`)
+    return null
+  }
+  console.log(`[url] fetching: ${url}`)
   try {
-    // Jina AI Reader — free, no key, bypasses most bot detection
     const jinaUrl = `https://r.jina.ai/${url}`
     const res = await fetch(jinaUrl, {
       headers: {
@@ -80,14 +86,15 @@ export async function scrapeUrl(url) {
       },
       signal: AbortSignal.timeout(15000),
     })
+    console.log(`[url] jina status: ${res.status} for ${url}`)
     if (!res.ok) return null
     const text = await res.text()
-    // Jina returns "Title: ...\nURL: ...\n\n<content>"
     const titleMatch = text.match(/^Title:\s*(.+)/m)
     const title = titleMatch ? titleMatch[1].trim() : url
     const body  = text.slice(0, 6000)
     return { title, body }
-  } catch {
+  } catch (err) {
+    console.log(`[url] fetch error: ${err.message}`)
     return null
   }
 }

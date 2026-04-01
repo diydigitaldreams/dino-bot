@@ -102,17 +102,25 @@ async function startBot() {
 
       if (jid.endsWith('@g.us')) continue
 
-      // Truncate input — no giant messages
+      // Extract text + any URLs from WhatsApp link previews
+      const msgObj = msg.message
       const raw =
-        msg.message.conversation ||
-        msg.message.extendedTextMessage?.text ||
-        msg.message.imageMessage?.caption ||
-        msg.message.extendedTextMessage?.canonicalUrl ||
+        msgObj.conversation ||
+        msgObj.extendedTextMessage?.text ||
+        msgObj.imageMessage?.caption ||
         ''
 
-      // Also grab any URL from WhatsApp link previews
-      const previewUrl = msg.message.extendedTextMessage?.canonicalUrl || ''
-      const text = (previewUrl ? `${raw.trim()} ${previewUrl}` : raw.trim()).slice(0, 2000)
+      // WhatsApp puts the actual URL in matchedText for link previews
+      const matchedUrl = msgObj.extendedTextMessage?.matchedText || ''
+      const canonicalUrl = msgObj.extendedTextMessage?.canonicalUrl || ''
+      const urlHint = matchedUrl || canonicalUrl
+
+      // Combine text with any detected URL so handlers can process it
+      const combined = urlHint && !raw.includes(urlHint)
+        ? `${raw.trim()} ${urlHint}`.trim()
+        : raw.trim()
+
+      const text = combined.slice(0, 2000)
       if (!text) continue
 
       enqueue(async () => {

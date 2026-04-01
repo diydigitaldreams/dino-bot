@@ -1,10 +1,10 @@
 export const STAGES = ['egg', 'hatchling', 'baby', 'adult']
 
 // Evolution gates — what each stage needs to advance
-const GATES = {
-  egg:      { interactions: 5,  url_feeds: 1,  label: 'hatchling' },
-  hatchling:{ interactions: 20, url_feeds: 3,  label: 'baby' },
-  baby:     { interactions: 50, url_feeds: 8,  label: 'adult' },
+export const GATES = {
+  egg:      { interactions: 3,  url_feeds: 0,  label: 'hatchling' },
+  hatchling:{ interactions: 15, url_feeds: 2,  label: 'baby' },
+  baby:     { interactions: 35, url_feeds: 5,  label: 'adult' },
 }
 
 // Stage emoji for messages
