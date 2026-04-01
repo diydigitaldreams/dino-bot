@@ -1,5 +1,4 @@
 import fetch from 'node-fetch'
-import { load } from 'cheerio'
 import { summarizeUrl } from './ai.js'
 
 const URL_REGEX = /https?:\/\/[^\s]+/gi
@@ -72,17 +71,22 @@ export function extractPersonalityTraits(text) {
 export async function scrapeUrl(url) {
   if (!isSafeUrl(url)) return null
   try {
-    const res = await fetch(url, {
-      headers: { 'User-Agent': 'Mozilla/5.0 (compatible; DinoBot/1.0)' },
-      signal: AbortSignal.timeout(8000),
-      follow: 3, // limit redirects
+    // Jina AI Reader — free, no key, bypasses most bot detection
+    const jinaUrl = `https://r.jina.ai/${url}`
+    const res = await fetch(jinaUrl, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (compatible; DinoBot/1.0)',
+        'Accept': 'text/plain',
+      },
+      signal: AbortSignal.timeout(15000),
     })
-    const html = await res.text()
-    const $    = load(html)
-    $('script, style, nav, footer, header, aside, iframe').remove()
-    const title = $('title').text().trim()
-    const body  = $('body').text().replace(/\s+/g, ' ').trim()
-    return { title, body: body.slice(0, 6000) }
+    if (!res.ok) return null
+    const text = await res.text()
+    // Jina returns "Title: ...\nURL: ...\n\n<content>"
+    const titleMatch = text.match(/^Title:\s*(.+)/m)
+    const title = titleMatch ? titleMatch[1].trim() : url
+    const body  = text.slice(0, 6000)
+    return { title, body }
   } catch {
     return null
   }
